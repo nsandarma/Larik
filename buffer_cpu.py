@@ -254,18 +254,24 @@ class Array:
         shape=self.shape
     )
     return np.asarray(np_arr, dtype=self.dtype)
+  
+  @staticmethod
+  def zeros(shape):
+    arr = Array(shape,"float64")
+    for i in range(arr.size):
+      arr._buffer[i] = 0.0
+    return arr
+
+  @staticmethod
+  def ones(shape,dtype="float64"):
+    arr = Array(shape,dtype)
+    val = 1 if dtype in ["int32","int64"] else 1.0
+    for i in range(arr.size):
+      arr._buffer[i] = val
+    return arr
 
 
 if __name__ == "__main__":
   n = 1024
-  a = Array.rand((n, n))
-  b = Array.rand((n, n))
-  tic = time.monotonic()
-  c = a @ b
-  print(c.numpy())
-  print(time.monotonic()-tic)
+  arr = Array.ones((1024,1024),"int32")
 
-  tic = time.monotonic()
-  d = a.numpy() @ b.numpy()
-  print(d)
-  print(time.monotonic()-tic)
