@@ -1,6 +1,7 @@
+#!/usr/bin/env python3.11
 import unittest,time
 from buffer_cpu import Array
-import numpy as np
+import numpy as np,time
 
 """
 """
@@ -12,7 +13,6 @@ class TestBufferCPU(unittest.TestCase):
     self.b = Array.rand((N,N)).astype("float32")
     self.a_numpy = self.a.numpy()
     self.b_numpy = self.b.numpy()
-
   
   def check_type(self):
     print(self.a.dtype)
@@ -52,10 +52,9 @@ class TestBufferCPU(unittest.TestCase):
 
 
 
-
 if __name__ == "__main__":
-  unittest.main()
+  start = time.monotonic()
+  unittest.main(exit=False)
+  end = time.monotonic()
+  print(f"Total test time: {end - start:.6f} seconds")
 
-    
-    
-  

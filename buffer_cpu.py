@@ -1,25 +1,19 @@
-from blas import libacc, CBLAS_COL_MAJOR, CBLAS_ROW_MAJOR, CBLAS_NO_TRANS, CBLAS_TRANS
-import ctypes,time,random
+from _blas import libacc, CBLAS_COL_MAJOR, CBLAS_ROW_MAJOR, CBLAS_NO_TRANS, CBLAS_TRANS
+import ctypes,random
 import numpy as np
-
 
 class Array:
   _dtype_map = {
-      'float32': ctypes.c_float,
-      'float64': ctypes.c_double,
-      'int32': ctypes.c_int,
-      'int64': ctypes.c_long,
+    'float32': ctypes.c_float,
+    'float64': ctypes.c_double,
+    'int32': ctypes.c_int,
+    'int64': ctypes.c_long,
   }
-
   def _check_compatibility(self, other):
-    if not isinstance(other, Array):
-      raise TypeError("Requires Array instance")
-    if len(self.shape) != 2 or len(other.shape) != 2:
-      raise ValueError("Both arrays must be 2D")
-    if self.shape[1] != other.shape[0]:
-      raise ValueError(f"Shapes {self.shape} and {other.shape} incompatible")
-    if self.dtype != other.dtype:
-      raise TypeError("Dtype mismatch")
+    if not isinstance(other, Array): raise TypeError("Requires Array instance")
+    if len(self.shape) != 2 or len(other.shape) != 2: raise ValueError("Both arrays must be 2D")
+    if self.shape[1] != other.shape[0]: raise ValueError(f"Shapes {self.shape} and {other.shape} incompatible")
+    if self.dtype != other.dtype: raise TypeError("Dtype mismatch")
 
   def __init__(self, shape, dtype='float32'):
     self.shape = shape if isinstance(shape, tuple) else (shape,)
@@ -58,10 +52,8 @@ class Array:
 
   def reshape(self, new_shape):
     new_size = 1
-    for dim in new_shape:
-      new_size *= dim
-    if new_size != self.size:
-      raise ValueError("Total size must remain unchanged")
+    for dim in new_shape: new_size *= dim
+    if new_size != self.size: raise ValueError("Total size must remain unchanged")
     self.shape = new_shape
     return self  # for chaining
 
@@ -102,16 +94,15 @@ class Array:
 
       # BLAS: y = alpha*x + y
       axpy(self.size, alpha,
-           other.data_as(ctypes.POINTER(other._ctype)), 1,
-           result.data_as(ctypes.POINTER(result._ctype)), 1)
+        other.data_as(ctypes.POINTER(other._ctype)), 1,
+        result.data_as(ctypes.POINTER(result._ctype)), 1)
       return result
 
     # Array + scalar
     elif isinstance(other, (int, float)):
       result = self.astype(self.dtype)
       scalar = self._ctype(other)
-      for i in range(self.size):
-        result._buffer[i] += scalar
+      for i in range(self.size): result._buffer[i] += scalar
       return result
     else:
       return NotImplemented
@@ -221,17 +212,16 @@ class Array:
     c_ptr = out.data_as(ctypes.POINTER(out._ctype))
 
     gemm(
-        CBLAS_ROW_MAJOR,  # Row-major ordering
-        CBLAS_NO_TRANS,   # No transpose A
-        CBLAS_NO_TRANS,   # No transpose B
-        M, N, K,          # Dimensions
-        alpha,            # Scalar multiplier
-        a_ptr, K,         # A matrix + leading dimension
-        b_ptr, N,         # B matrix + leading dimension
-        beta,             # Initial value multiplier
-        c_ptr, N          # C matrix + leading dimension
+      CBLAS_ROW_MAJOR,  # Row-major ordering
+      CBLAS_NO_TRANS,   # No transpose A
+      CBLAS_NO_TRANS,   # No transpose B
+      M, N, K,          # Dimensions
+      alpha,            # Scalar multiplier
+      a_ptr, K,         # A matrix + leading dimension
+      b_ptr, N,         # B matrix + leading dimension
+      beta,             # Initial value multiplier
+      c_ptr, N          # C matrix + leading dimension
     )
-
     return out
   
   def definitelyNotDot(self,other): return self.__matmul__(other)
@@ -269,6 +259,7 @@ class Array:
     for i in range(arr.size):
       arr._buffer[i] = val
     return arr
+
 
 
 if __name__ == "__main__":

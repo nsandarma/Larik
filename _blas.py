@@ -1,7 +1,14 @@
 import ctypes,time
+import ctypes.util
 import numpy as np
+import os,time
 
-libacc = ctypes.cdll.LoadLibrary("/System/Library/Frameworks/Accelerate.framework/Accelerate")
+if os.environ.get("BLAS") == "1":
+  blas_path = "blas/lib/libopenblas.dylib"
+  print("USING OPENBLAS ...")
+else: blas_path = ctypes.util.find_library("libblas.dylib")
+
+libacc = ctypes.CDLL(blas_path)
 
 # Constanta
 CBLAS_ROW_MAJOR = 101
