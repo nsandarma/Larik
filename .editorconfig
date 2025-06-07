@@ -1,0 +1,12 @@
+root = true
+[*.py]
+indent_style = space
+indent_size = 2
+
+[*.cpp]
+indent_style = space
+indent_size = 2
+
+[*.hpp]
+indent_style = space
+indent_size = 2
