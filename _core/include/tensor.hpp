@@ -30,7 +30,9 @@ private:
   void validate_shape() const {
     size_t computed_size = std::accumulate(
         shape_.begin(), shape_.end(), size_t(1), std::multiplies<size_t>());
-    if (computed_size != size_) {
+    if (shape()[0] == 0) {
+      throw std::invalid_argument("Shape [0] not support zero");
+    } else if (computed_size != size_) {
       throw std::invalid_argument("Shape dimensions do not match buffer size");
     }
   }
@@ -396,8 +398,8 @@ public:
   static Tensor<T> zeros(const std::vector<size_t> &shape) {
     size_t size = std::accumulate(shape.begin(), shape.end(), size_t(1),
                                   std::multiplies<size_t>());
-    std::vector<T> buff = std::vector<T>(size, T(0));
-    return Tensor<T>(shape, std::move<>);
+    std::vector<T> buff(size, T(0));
+    return Tensor<T>(shape, std::move(buff));
   }
 
   static Tensor<T> rand(const std::vector<size_t> &shape,
@@ -491,8 +493,11 @@ public:
     }
     return Tensor<T>({cols, rows}, std::move(transposed_data));
   }
-
-  void flatten() { shape_ = {size_}; }
+  Tensor<T> flatten() const {
+    Tensor<T> flatted = *this;
+    flatted.shape_ = {size_};
+    return flatted;
+  }
 };
 
 #endif

@@ -13,6 +13,8 @@ class Larik:
     self._dtype = dtype
 
   def __str__(self): return f"<{self.dtype} {self.shape}>"
+  def __repr__(self): return str(self)
+
 
   # Slicing
   def matmul(self, other: "Larik") -> "Larik":
@@ -59,7 +61,8 @@ class Larik:
 
   def astype(self,dtype:Dtype): return Larik(Dtype.cast(self._buffer,dtype),dtype)
 
-  def flatten(self):pass
+  def flatten(self): return Larik(self.buffer.flatten(),self.dtype)
+
   
   def reshape(self,shape:Sequence):
     assert math.prod(shape) == self.size, "reshape is error !"
@@ -87,11 +90,11 @@ class Larik:
   #     return np.lib.stride_tricks.as_strided(data_ptr, shape=self.shape, strides=strides_bytes)
   #   else: return data_ptr.reshape(self.shape)
 
-def create(data,dtype:Dtype | str = Dtype.float32):
+def create(data,dtype:Dtype | str = Dtype.float32) -> Larik:
   buff = Dtype.to_class(dtype).from_nested(data)
   return Larik(buff=buff,dtype=dtype)
 
-def createND(data,shape:Sequence,dtype:Dtype | str =Dtype.float32):
+def createND(data,shape:Sequence,dtype:Dtype | str =Dtype.float32) -> Larik:
   buff = Dtype.to_class(dtype)(shape,data)
   return Larik(buff=buff,dtype=dtype)
 
@@ -101,15 +104,20 @@ def arange(start,end,step):
   buff = Dtype.to_class(dtype).arange(start,end,step)
   return Larik(buff=buff,dtype=dtype)
 
-def rand(shape:Sequence,seed:int=0,dtype:Dtype | str =Dtype.float32):
+def zeros(shape:Sequence,dtype:Dtype=Dtype.int32) -> Larik:
+  buff = Dtype.to_class(dtype).zeros(shape)
+  return Larik(buff=buff,dtype=dtype)
+
+
+def rand(shape:Sequence,seed:int=0,dtype:Dtype | str =Dtype.float32) -> Larik:
   buff = Dtype.to_class(dtype).rand(shape,seed)
   return Larik(buff=buff,dtype=dtype)
 
-def randn(shape:Sequence,seed:int=0,dtype:Dtype | str =Dtype.float32):
+def randn(shape:Sequence,seed:int=0,dtype:Dtype | str =Dtype.float32) -> Larik:
   buff = Dtype.to_class(dtype).randn(shape,seed)
   return Larik(buff=buff,dtype=dtype)
 
-def randint(shape:Sequence,low:int=0,high:int=100):
+def randint(shape:Sequence,low:int=0,high:int=100) -> Larik:
   buff = Dtype.to_class(Dtype.int32).randint(shape,low,high)
   return Larik(buff=buff,dtype=Dtype.int32)
 
